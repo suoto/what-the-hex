@@ -34,5 +34,26 @@ Plug 'nvim-lua/plenary.nvim'
 Plug 'suoto/what-the-hex'
 ```
 
+## Options
+
+### `vim.g.what_the_hex_character`
+
+Selects which character to insert.
+
+Defaults to `_` (single underscore).
+
+### `vim.g.what_the_hex_highlight`
+
+Selects the highlight group of the inserted character.
+
+Defaults to `Normal`.
+
+### `vim.g.what_the_hex_character_width`
+
+Selects how many characters each group has. Note that this is in nibbles, so `8`
+corresponds to 4 bytes.
+
+Defaults to `8`.
+
 [plenary.nvim]: https://github.com/nvim-lua/plenary.nvim
 [vim-plug]: https://github.com/junegunn/vim-plug
