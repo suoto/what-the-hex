@@ -20,13 +20,14 @@ vim.g.what_the_hex_character_width = vim.g.what_the_hex_character_width or 8
 local namespace = vim.api.nvim_create_namespace("WhatTheHex")
 local hex_pattern = "0[xX]%x+"
 
-local _logger = require("plenary.log").new {
-  plugin = "what-the-hex",
-  level = "warn",
-  -- use_file = true,
-  -- use_console = false,
-  -- outfile = "/tmp/what_the_hex.log"
-}
+-- Setup logger
+local logger_params = { plugin = "what-the-hex", level = "warn" }
+if vim.g.what_the_hex_debug == true then
+  logger_params.level = "trace"
+  logger_params.use_console = false
+  logger_params.outfile = "/tmp/what_the_hex.log"
+end
+local _logger = require("plenary.log").new(logger_params)
 
 -- Return a tuple with first/last lines being displayed
 local function get_first_and_last_lines_being_displayed(win_id)
@@ -71,7 +72,7 @@ local function find_marks_in_lines(lines)
   return marks
 end
 
--- Delete the either marks no longer being displayed or all marks
+-- Delete either the marks no longer being displayed or all marks
 local function delete_marks(win_id, buf_id, force)
   local force = force or false
   local first, last = get_first_and_last_lines_being_displayed(win_id)
@@ -191,7 +192,7 @@ command("WhatTheHexToggleBuffer", function()
   if vim.b.what_the_hex_enable then
     create_marks(win_id, buf_id)
   else
-    delete_marks(win_id, buf_id)
+    delete_marks(win_id, buf_id, true)
   end
 end, { nargs = 0 })
 
@@ -203,17 +204,13 @@ command("WhatTheHexClear", function()
   -- -- Get the buffer associated with the current window
   local buf_id = vim.api.nvim_win_get_buf(win_id)
 
-  delete_marks(win_id, buf_id)
+  delete_marks(win_id, buf_id, true)
 end, { nargs = 0 })
 
 
--- Create plugin auto commands
-
 -- Refresh marks when window has scrolled or when entering a buffer
-local augroup = vim.api.nvim_create_augroup("WhatTheHex", {})
-
 vim.api.nvim_create_autocmd({ "WinScrolled", "BufEnter", "InsertLeave", "TextChanged" },  {
-  group = augroup,
+  group = vim.api.nvim_create_augroup("WhatTheHex", {}),
   callback = function(opts)
     _logger.debug("Handling event", opts.event)
     -- Get the current window ID
