@@ -36,7 +36,7 @@ Plug 'suoto/what-the-hex'
 
 ## Options
 
-### `vim.g.what_the_hex_character`
+### `vim.g.what_the_hex_separator`
 
 Selects which character to insert.
 
@@ -48,7 +48,7 @@ Selects the highlight group of the inserted character.
 
 Defaults to `Normal`.
 
-### `vim.g.what_the_hex_character_width`
+### `vim.g.what_the_hex_group_width`
 
 Selects how many characters each group has. Note that this is in nibbles, so `8`
 corresponds to 4 bytes.

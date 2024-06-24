@@ -10,10 +10,10 @@ if vim.g.what_the_hex_enable == nil then
 end
 
 -- Options for nvim_buf_set_extmark
-vim.g.what_the_hex_character = vim.g.what_the_hex_character or '_'
+vim.g.what_the_hex_separator = vim.g.what_the_hex_separator or '_'
 vim.g.what_the_hex_highlight = vim.g.what_the_hex_highlight or 'Normal'
 -- Other options
-vim.g.what_the_hex_character_width = vim.g.what_the_hex_character_width or 8
+vim.g.what_the_hex_group_width = vim.g.what_the_hex_group_width or 8
 
 --
 
@@ -61,11 +61,11 @@ local function find_marks_in_lines(lines)
   for i, line in pairs(lines) do
     for _, position in ipairs(find_hex_numbers(line)) do
       -- Work backwards the position and add a mark every N characters
-      local column = position.last - vim.g.what_the_hex_character_width
+      local column = position.last - vim.g.what_the_hex_group_width
       while column > position.first + 1 do
         _logger.trace("Found mark at line", i, "column", column)
         table.insert(marks, {line=i - 1, column=column})
-        column = column - vim.g.what_the_hex_character_width
+        column = column - vim.g.what_the_hex_group_width
       end
     end
   end
@@ -146,7 +146,7 @@ local function create_marks(win_id, buf_id)
       vim.api.nvim_buf_set_extmark(
         buf_id , namespace , mark.line, mark.column,
         {
-          virt_text = { {vim.g.what_the_hex_character, vim.g.what_the_hex_highlight} },
+          virt_text = { {vim.g.what_the_hex_separator, vim.g.what_the_hex_highlight} },
           virt_text_pos = "inline"
         }
       )
