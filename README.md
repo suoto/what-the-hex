@@ -1,7 +1,5 @@
 # what-the-hex
 
-Helper for visualizing large hex numbers in Neovim.
-
 This plugin inserts a virtual underscore character every 4 bytes to help
 visualizing large hex numbers.
 
@@ -23,3 +21,18 @@ baz = 0x900001_e7ccb1d4
 
 Note that the underscore is virtual, so searching or copying text will ignore it
 completely.
+
+## Installation
+
+Install with your preferred plugin manager. Note that what-the-hex requires
+[plenary.nvim].
+
+For example, using [vim-plug]:
+
+```vimrc
+Plug 'nvim-lua/plenary.nvim'
+Plug 'suoto/what-the-hex'
+```
+
+[plenary.nvim]: https://github.com/nvim-lua/plenary.nvim
+[vim-plug]: https://github.com/junegunn/vim-plug
