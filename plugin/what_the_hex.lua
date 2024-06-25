@@ -29,6 +29,7 @@ if vim.g.what_the_hex_debug == true then
 end
 local _logger = require("plenary.log").new(logger_params)
 
+
 -- Return a tuple with first/last lines being displayed
 local function get_first_and_last_lines_being_displayed(win_id)
   local result = vim.api.nvim_win_call(win_id,
@@ -37,6 +38,7 @@ local function get_first_and_last_lines_being_displayed(win_id)
 
   return result[1] - 1, result[2] - 1
 end
+
 
 -- Function to search for all hex numbers in the text
 local function find_hex_numbers(text)
@@ -72,6 +74,7 @@ local function find_marks_in_lines(lines)
   return marks
 end
 
+
 -- Delete either the marks no longer being displayed or all marks
 local function delete_marks(win_id, buf_id, force)
   local force = force or false
@@ -104,6 +107,7 @@ local function delete_marks(win_id, buf_id, force)
 
 end
 
+
 local function get_lines_being_displayed(win_id, buf_id)
   local first, last = get_first_and_last_lines_being_displayed(win_id)
 
@@ -122,26 +126,19 @@ local function get_lines_being_displayed(win_id, buf_id)
   return result
 end
 
--- TODO: we could use binary search if extmarks is ordered
-local function has_mark_for_this_line(line, extmarks)
-  local set = {}
-  -- Create a table where each index is true. This should speed up searching of
-  -- long arrays
-  for i, extmark in ipairs(extmarks) do
-    set[extmark[2]] = true
-  end
-  -- Keys that are not in the array will return nil, so if we find a true it
-  -- means the line was in the original list
-  return set[line] == true
-
-end
 
 local function create_marks(win_id, buf_id)
-  local marks = vim.api.nvim_buf_get_extmarks(buf_id, namespace, 0, -1, {})
+  -- Create a table where the index represents the line numbers of existing
+  -- marks to speed up searching. Keys that are not in the array will return
+  -- nil, so if we find a true it means the line was in the original list
+  local existing_marks = {}
+  for i, extmark in ipairs(vim.api.nvim_buf_get_extmarks(buf_id, namespace, 0, -1, {})) do
+    existing_marks[extmark[2]] = true
+  end
 
   local added = 0
   for i, mark in ipairs(find_marks_in_lines(get_lines_being_displayed(win_id, buf_id))) do
-    if not has_mark_for_this_line(mark.line, marks) then
+    if existing_marks[mark.line] ~= true then
       _logger.trace('mark(line=', mark.line, ', column=', mark.column, 'is new')
       vim.api.nvim_buf_set_extmark(
         buf_id , namespace , mark.line, mark.column,
@@ -158,6 +155,7 @@ local function create_marks(win_id, buf_id)
 
   _logger.debug("Added", added, "marks")
 end
+
 
 local function refresh_marks(win_id, buf_id, force)
   delete_marks(win_id, buf_id, force)
