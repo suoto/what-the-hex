@@ -15,7 +15,7 @@ vim.g.what_the_hex_group_width = vim.g.what_the_hex_group_width or 8
 --
 
 local namespace = vim.api.nvim_create_namespace("WhatTheHex")
-local hex_pattern = "0[xX]%x+"
+local hex_patterns = {"0[xX]%x+", "'h%x+"}
 
 -- Setup logger
 local logger_params = {plugin = "what-the-hex", level = "warn"}
@@ -39,12 +39,14 @@ end
 local function find_hex_numbers(text)
   local positions = {}
 
-  local start_pos, end_pos = 1, 1
-  while true do
-    start_pos, end_pos = string.find(text, hex_pattern, end_pos)
-    if not start_pos then break end
-    table.insert(positions, {first = start_pos, last = end_pos})
-    end_pos = end_pos + 1
+  for i, hex_pattern in pairs(hex_patterns) do
+    local start_pos, end_pos = 1, 1
+    while true do
+      start_pos, end_pos = string.find(text, hex_pattern, end_pos)
+      if not start_pos then break end
+      table.insert(positions, {first = start_pos, last = end_pos})
+      end_pos = end_pos + 1
+    end
   end
 
   return positions
