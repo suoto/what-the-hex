@@ -115,12 +115,12 @@ local function create_marks(win_id, buf_id)
   -- speed up searching. Keys that are not in the array will return nil, so if we find a
   -- true it means the line was in the original list
   local existing_marks = {}
-  for i, extmark in ipairs(vim.api.nvim_buf_get_extmarks(buf_id, namespace, 0, -1, {})) do
+  for _, extmark in ipairs(vim.api.nvim_buf_get_extmarks(buf_id, namespace, 0, -1, {})) do
     existing_marks[extmark[2]] = true
   end
 
   local added = 0
-  for i, mark in ipairs(find_marks_in_lines(get_lines_being_displayed(win_id, buf_id))) do
+  for _, mark in ipairs(find_marks_in_lines(get_lines_being_displayed(win_id, buf_id))) do
     if existing_marks[mark.line] ~= true then
       _logger.trace("mark(line=", mark.line, ", column=", mark.column, "is new")
       vim.api.nvim_buf_set_extmark(buf_id, namespace, mark.line, mark.column, {
