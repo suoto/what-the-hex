@@ -200,8 +200,9 @@ vim.api.nvim_create_autocmd({"WinScrolled", "BufEnter", "InsertLeave", "TextChan
     end
 
     vim.b[buf_id].what_the_hex_initialized = 1
-    -- Force refreshing when text changed
-    refresh_marks(win_id, buf_id, opts.event == "TextChanged")
+    -- Define which events to force refreshing the marks
+    local force_refresh_events = { TextChanged = true, InsertLeave = true }
+    refresh_marks(win_id, buf_id, force_refresh_events[opts.event])
   end,
   desc = "Refresh plugin's separator marks"
 })
