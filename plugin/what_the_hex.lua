@@ -15,10 +15,10 @@ vim.g.what_the_hex_group_width = vim.g.what_the_hex_group_width or 8
 --
 
 local namespace = vim.api.nvim_create_namespace("WhatTheHex")
-local hex_patterns = {"0[xX]%x+", "'h%x+"}
+local hex_patterns = { "0[xX]%x+", "'h%x+" }
 
 -- Setup logger
-local logger_params = {plugin = "what-the-hex", level = "warn"}
+local logger_params = { plugin = "what-the-hex", level = "warn" }
 if vim.g.what_the_hex_debug == true then
   logger_params.level = "trace"
   logger_params.use_console = false
@@ -29,7 +29,7 @@ local _logger = require("plenary.log").new(logger_params)
 -- Return a tuple with first/last lines being displayed
 local function get_first_and_last_lines_being_displayed(win_id)
   local result = vim.api.nvim_win_call(win_id, function()
-    return {vim.fn.line("w0"), vim.fn.line("w$")}
+    return { vim.fn.line("w0"), vim.fn.line("w$") }
   end)
 
   return result[1] - 1, result[2] - 1
@@ -39,12 +39,12 @@ end
 local function find_hex_numbers(text)
   local positions = {}
 
-  for i, hex_pattern in pairs(hex_patterns) do
-    local start_pos, end_pos = 1, 1
+  for _, hex_pattern in pairs(hex_patterns) do
+    local start_pos, end_pos = nil, nil
     while true do
       start_pos, end_pos = string.find(text, hex_pattern, end_pos)
       if not start_pos then break end
-      table.insert(positions, {first = start_pos, last = end_pos})
+      table.insert(positions, { first = start_pos, last = end_pos })
       end_pos = end_pos + 1
     end
   end
@@ -62,7 +62,7 @@ local function find_marks_in_lines(lines)
       local column = position.last - vim.g.what_the_hex_group_width
       while column > position.first + 1 do
         _logger.trace("Found mark at line", i, "column", column)
-        table.insert(marks, {line = i - 1, column = column})
+        table.insert(marks, { line = i - 1, column = column })
         column = column - vim.g.what_the_hex_group_width
       end
     end
@@ -72,7 +72,6 @@ end
 
 -- Delete either the marks no longer being displayed or all marks
 local function delete_marks(win_id, buf_id, force)
-  local force = force or false
   local first, last = get_first_and_last_lines_being_displayed(win_id)
 
   local deleted = 0
@@ -84,12 +83,12 @@ local function delete_marks(win_id, buf_id, force)
     if force or line < first or line > last then
       deleted = deleted + 1
       _logger.trace(string.format("mark(id=%d, line=%d, column=%d)", id, line, column),
-                    "is outside of lines", string.format("[%d..%d]", first, last),
-                    "and is no longer visible")
+        "is outside of lines", string.format("[%d..%d]", first, last),
+        "and is no longer visible")
       vim.api.nvim_buf_del_extmark(buf_id, namespace, id)
     else
       _logger.trace(string.format("mark(id=%d, line=%d, column=%d)", id, line, column),
-                    "is still visible")
+        "is still visible")
     end
   end
 
@@ -124,7 +123,7 @@ local function create_marks(win_id, buf_id)
     if existing_marks[mark.line] ~= true then
       _logger.trace("mark(line=", mark.line, ", column=", mark.column, "is new")
       vim.api.nvim_buf_set_extmark(buf_id, namespace, mark.line, mark.column, {
-        virt_text = {{vim.g.what_the_hex_separator, vim.g.what_the_hex_highlight}},
+        virt_text = { { vim.g.what_the_hex_separator, vim.g.what_the_hex_highlight } },
         virt_text_pos = "inline"
       })
       added = added + 1
@@ -153,7 +152,7 @@ command("WhatTheHexRefresh", function()
   local buf_id = vim.api.nvim_win_get_buf(win_id)
 
   refresh_marks(win_id, buf_id, true)
-end, {nargs = 0})
+end, { nargs = 0 })
 
 -- Toggle plugin enable for the current buffer only. This clears or creates marks as
 -- needed
@@ -171,7 +170,7 @@ command("WhatTheHexToggleBuffer", function()
   else
     delete_marks(win_id, buf_id, true)
   end
-end, {nargs = 0})
+end, { nargs = 0 })
 
 -- Clear all marks
 command("WhatTheHexClear", function()
@@ -182,10 +181,10 @@ command("WhatTheHexClear", function()
   local buf_id = vim.api.nvim_win_get_buf(win_id)
 
   delete_marks(win_id, buf_id, true)
-end, {nargs = 0})
+end, { nargs = 0 })
 
 -- Refresh marks when window has scrolled or when entering a buffer
-vim.api.nvim_create_autocmd({"WinScrolled", "BufEnter", "InsertLeave", "TextChanged"}, {
+vim.api.nvim_create_autocmd({ "WinScrolled", "BufEnter", "InsertLeave", "TextChanged" }, {
   group = vim.api.nvim_create_augroup("WhatTheHex", {}),
   callback = function(opts)
     _logger.debug("Handling event", opts.event)
